@@ -53,4 +53,4 @@ Consumer for debugging
 kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic topik.name.here
 ```
 
-> **_NOTE:_**  Replace <topik.name.here> with your topic name
+> **_NOTE:_**  Replace the <topik.name.here> with your topic name
