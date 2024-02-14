@@ -1,5 +1,10 @@
 # Keycloak for development
 
+1. Clone this repository for local development.
+2. Create ```.env``` file or rename ```.env.example```
+3. Run with comand: ```docker compose up -d```
+
+
 ## Services:
 1. [Keycloak](https://hub.docker.com/r/bitnami/keycloak)
 2. [Postgres](https://hub.docker.com/r/bitnami/postgresql)
