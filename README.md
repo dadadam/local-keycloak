@@ -10,9 +10,9 @@
 
 
 ## Exposed ports
-- Keycloak: ```8181``` (HTTP)
-- PG Admin: ```5050``` (HTTP)
-- KafkaUI: ```2181``` (HTTP)
+- Keycloak: ```8181``` [link](http://localhost:8181)
+- PG Admin: ```5050``` [link](http://localhost:5050)
+- KafkaUI: ```2181``` [link](http://localhost:2181)
 
 
 ## Custom theme and SPI
@@ -41,7 +41,16 @@ password from env: PGADMIN_PASSWORD
 ```
 
 ### Kafka:
+Create topic with 3 partitions and replication factor equals 1
 ```shell
-# run default consumer, for debug
+# run in kafka container instance
+kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic <topik.name.here> --replication-factor 1 --partitions 3
+```
+
+Consumer for debugging
+```shell
+# run in kafka container instance
 kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic topik.name.here
 ```
+
+> **_NOTE:_**  Replace <topik.name.here> with your topic name
