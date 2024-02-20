@@ -22,13 +22,16 @@ services:
       - KEYCLOAK_ENABLE_HEALTH_ENDPOINTS=true
       - KC_HEALTH_ENABLED=true
       - KEYCLOAK_ENABLE_STATISTICS=true
-      - KEYCLOAK_LOG_LEVEL=debug
+      - KEYCLOAK_LOG_LEVEL=info
       - KEYCLOAK_EXTRA_ARGS_PREPENDED=${KC_EXTRA_ARGS}
-    volumes:
-      - "./providers:/opt/bitnami/keycloak/providers"
-      - "./themes:/opt/bitnami/keycloak/themes"
+    # Add my volumes in docker-compose.override.yml
+    # volumes:
+    #   - "./providers:/opt/bitnami/keycloak/providers"
+    #   - "./themes:/opt/bitnami/keycloak/themes"
     ports:
       - "0.0.0.0:8181:8181"
+    networks:
+      - app_net
     depends_on:
       db:
         condition: service_healthy
@@ -49,6 +52,8 @@ services:
       - POSTGRESQL_DATABASE=${DB_NAME}
     volumes:
       - "postgres_data:/bitnami/postgresql"
+    networks:
+      - app_net
 
   pg_admin:
     image: dpage/pgadmin4:8.3
@@ -60,18 +65,23 @@ services:
       - "pgadmin_data:/pgadmin4"
     ports:
       - "5050:5050"
+    networks:
+      - app_net
     depends_on:
       - db
 
   kafka:
     image: bitnami/kafka:3.6.1
+    hostname: kafka
     environment:
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://0.0.0.0:9094
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://:9094
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
     volumes:
       - "kafka_data:/bitnami/kafka"
+    networks:
+      - app_net
     depends_on:
       - zookeeper
 
@@ -81,6 +91,8 @@ services:
       - ALLOW_ANONYMOUS_LOGIN=yes
     volumes:
       - "zookeeper_data:/bitnami/zookeeper"
+    networks:
+      - app_net
 
   ui:
     image: provectuslabs/kafka-ui:latest
@@ -90,6 +102,8 @@ services:
       - DYNAMIC_CONFIG_ENABLED=true
       - KAFKA_CLUSTERS_0_NAME=infra-kafka
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+    networks:
+      - app_net
     depends_on:
       - kafka
       - zookeeper
@@ -104,3 +118,6 @@ volumes:
     driver: local
   zookeeper_data:
     driver: local
+
+networks:
+  app_net:
